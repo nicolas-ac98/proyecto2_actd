@@ -7,17 +7,22 @@ def process():
     # Dataset ---------------------------------------------------------
     df = pd.read_csv("../data/Base de Datos - Icfes.zip")
     print("Carga correcta de los datos")
+    
     # Remover variables innecesarias
     drop_variables(df)
     print("Eliminacion de variables")
+    
     # Tranformacion de variables
     standarize_number_variables(df)
-    standarize_categorical_variables(df)
-    print("estandarización de variables")
+    df = standarize_categorical_variables(df=df, interest_value='DESEMP_INGLES')
+    print("Estandarización de variables")
     # Remove duplicates
     df = df.drop_duplicates()
+    # Guardar archivo
+    print("guardar archivo")
+    df.to_csv("../data/dataset_v1.csv.zip",index=False)
 
-    print(df.head())
+    print(df.columns)
 
 # funciones
 def drop_variables(df):
@@ -62,18 +67,22 @@ def standarize_number_variables(df):
 # Función de limpieza de texto
 def limpiar_texto(texto):
     if pd.isnull(texto):
-        return texto
+        return "na"
     texto = unidecode.unidecode(texto)  # elimina tildes y reemplaza ñ por n
     texto = texto.replace(' ', '_')     # reemplaza espacios por guiones bajos
     return texto.lower()                # convierte a minúsculas (opcional)
 
-def standarize_categorical_variables(df):
+def standarize_categorical_variables(df, interest_value):
     # Seleccionar columnas categóricas (strings)
-    cat_cols = df.select_dtypes(include='object').columns
-
+    cat_cols = list(df.select_dtypes(include='object').columns)
     # Aplicar la limpieza
     for col in cat_cols:
         df[col] = df[col].apply(limpiar_texto)
+    
+    # Transformar variables a dummy 
+    cat_cols.remove(interest_value)
+    df = pd.get_dummies(df, columns=cat_cols, drop_first=False)
+    return df
 
 if __name__ == '__main__':
     process()
