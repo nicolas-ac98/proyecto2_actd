@@ -76,7 +76,8 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
     
-    experiment = mlflow.set_experiment("Test ingles")
+    experiment = mlflow.set_experiment("Test_ingles")
+    # mlflow.set_tracking_uri('http://localhost:5001')
     
      # 6. Run de MLflow
     with mlflow.start_run(run_name="pmv",
@@ -103,7 +104,8 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
 
         # Guardar modelo y preprocesador
         signature = infer_signature(X_train, model.predict(X_train))
-        # input_example = X_train[:5]
+        input_example = X[:5]
+        input_example.to_csv("../data/input_example_v1.csv")
         mlflow.keras.log_model(
             model, 
             artifact_path="performance_ingles_v1",
