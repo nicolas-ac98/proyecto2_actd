@@ -5,98 +5,116 @@ import mlflow
 import mlflow.keras
 import keras
 import tensorflow as tf
-import tensorflow.keras as tk
-from keras import models
-from keras import layers
 import argparse # Usaremos argparse para pasarle argumentos a las funciones de entrenamiento
 from sklearn.model_selection import train_test_split
- 
-# Dataset ---------------------------------------------------------
-# Obtenemos el dataset MNIST 
-df = pd.read_csv("../data/Bdataset_v1.csv.zip")
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from mlflow.models.signature import infer_signature
+import joblib
 
-# Dividir el conjunto en variable de interes y predictores
-interest_variable = 'DESEMP_INGLES'
-X = df.drop(interest_variable, axis=1)
-y = df[interest_variable]
-print("Se cargo el conjunto de datos")
-print("Variable de interés {}".format(interest_variable))
-print("Num. variable predictoras: {}".format(len(X.columns.to_list())))
-print("Lista variable predictoras: {}".format(X.columns.to_list()))
-print("Num registros: {}".format(len(X)))
 
-# Dividimos el conjunto de datos en train test
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+def process(epochs=10, batch_size=32, learning_rate=0.001):
+    # Dataset ---------------------------------------------------------
+    # Obtenemos el dataset MNIST 
+    df = pd.read_csv("../data/dataset_v1.csv.zip")
 
-parser = argparse.ArgumentParser(description='Entrenamiento de una red feed-forward para el problema de clasificación con datos Saber 11 en TensorFlow/Keras')
-parser.add_argument('--batch_size', '-b', type=int, default=128)
-parser.add_argument('--epochs', '-e', type=int, default=5)
-parser.add_argument('--learning_rate', '-l', type=float, default=0.05)
-parser.add_argument('--num_hidden_units', '-n', type=int, default=512)
-parser.add_argument('--num_hidden_layers', '-N', type=int, default=1)
-parser.add_argument('--dropout', '-d', type=float, default=0.25)
-parser.add_argument('--momentum', '-m', type=float, default=0.85)
+    # Dividir el conjunto en variable de interes y predictores
+    interest_variable = 'DESEMP_INGLES'
+    X = df.drop(interest_variable, axis=1)
 
-args = parser.parse_args([])
+    print(df.groupby([interest_variable]).size())
 
-# Usaremos esta función para definir Descenso de Gradiente Estocástico como optimizador
-def get_optimizer():
-    """
-    :return: Keras optimizer
-    """
-    optimizer = keras.optimizers.SGD(learning_rate=args.learning_rate,momentum=args.momentum, nesterov=True)
-    return optimizer
+    y_processed = tf.keras.utils.to_categorical(df[interest_variable], num_classes=5)
+    print("Se cargo el conjunto de datos")
+    print("Variable de interés {}".format(interest_variable))
+    print("Num. variable predictoras: {}".format(len(X.columns.to_list())))
+    print("Lista variable predictoras: {}".format(X.columns.to_list()))
+    print("Num registros: {}".format(len(X)))
 
-# Esta función define una corrida del modelo, con entrenamiento y 
-# registro en MLflow
-def run_mlflow(run_name="MLflow Saber 11"):
-    # Iniciamos una corrida de MLflow
-    mlflow.start_run(run_name=run_name)
-    run = mlflow.active_run()
-    # MLflow asigna un ID al experimento y a la corrida
-    experimentID = run.info.experiment_id
-    runID = run.info.run_uuid
-    # reistro automáticos de las métricas de keras
-    mlflow.keras.autolog()
-    model = models.Sequential()
-    #
-    # La primera capa de la red transforma las imágenes de un arreglo 2d (28x28 pixels),
-    # en un arreglo 1d de 28 * 28 = 784 pixels.
-    model.add(layers.Flatten(input_shape=X_train[0].shape))
-    # Agregamos capas ocultas a la red
-    # en los argumentos: --num_hidden_layers o -N 
-    for n in range(0, args.num_hidden_layers):
-        # agregamos una capa densa (completamente conectada) con función de activación relu
-        model.add(layers.Dense(args.num_hidden_units, activation=tf.nn.relu))
-        # agregamos dropout como método de regularización para aleatoriamente descartar una capa
-        # si los gradientes son muy pequeños
-        model.add(layers.Dropout(args.dropout))
-        # capa final con 10 nodos de salida y activación softmax 
-        model.add(layers.Dense(10, activation=tf.nn.softmax))
-        # Use Scholastic Gradient Descent (SGD) or Adadelta
-        # https://keras.io/optimizers/
-        optimizer = get_optimizer()
+    cat_cols = [
+        'COLE_CARACTER', 'COLE_DEPTO_UBICACION', 'COLE_GENERO', 'COLE_JORNADA',
+        'ESTU_ESTADOINVESTIGACION', 'ESTU_NACIONALIDAD', 'FAMI_EDUCACIONMADRE',
+        'FAMI_EDUCACIONPADRE'
+        ]
 
-    # compilamos el modelo y definimos la función de pérdida  
-    # otras funciones de pérdida comunes para problemas de clasificación
-    # 1. sparse_categorical_crossentropy
-    # 2. binary_crossentropy
+    num_cols = ['ESTRATOVIVIENDA', 'CUARTOSHOGAR', 'PERSONASHOGAR']
+
+    bin_cols = [
+        'COLE_AREA_URBANO', 'BILINGUE', 'CALEN_A', 'COLE_OFICIAL', 
+        'SEDE_PRINCIPAL', 'SEXO_FEM','TIENE_AUTOMOVIL', 'TIENE_COMPUTADOR', 
+        'TIENE_INTERNET','TIENE_LAVADORA'
+        ]
+
+    # 2. Definir transformaciones
+    preprocessor = ColumnTransformer([
+        # One-Hot para categóricas
+        ('ohe', OneHotEncoder(handle_unknown='ignore'), cat_cols),
+        # Escalado para numéricas
+        ('scale', StandardScaler(), num_cols),
+        # Passthrough para binarias
+        ('pass', 'passthrough', bin_cols)
+    ])
+
+    # 3. Transformar datos
+    X_processed = preprocessor.fit_transform(X)
+
+    # Dividimos el conjunto de datos en train test
+    X_train, X_test, y_train, y_test = train_test_split(X_processed, y_processed, 
+                                                        test_size=0.2, random_state=73)
+    
+
+    # 5. Construir el modelo
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
+        tf.keras.layers.Dense(16,  activation='relu'),
+        tf.keras.layers.Dense(5,  activation=tf.nn.softmax)
+    ])
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
     model.compile(optimizer=optimizer,
-                 loss='sparse_categorical_crossentropy',
-                 metrics=['accuracy'])
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    
+    experiment = mlflow.set_experiment("Test ingles")
+    
+     # 6. Run de MLflow
+    with mlflow.start_run(run_name="pmv",
+                          experiment_id=experiment.experiment_id):
+        # Parámetros
+        mlflow.log_param("epochs", epochs)
+        mlflow.log_param("batch_size", batch_size)
+        mlflow.log_param("learning_rate", learning_rate)
+        mlflow.log_param("categorical_cols", cat_cols)
+        mlflow.log_param("numeric_cols", num_cols)
+        mlflow.log_param("binary_cols", bin_cols)
 
-    # entrenamos el modelo
-    print("-" * 100)
-    model.fit(x_train, y_train, epochs=args.epochs, batch_size=args.batch_size)
-    # evaluamos el modelo
-    test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
-    mlflow.end_run(status='FINISHED')
-    return (experimentID, runID)
+        # Entrenamiento
+        model.fit(
+            X_train, y_train,
+            validation_split=0.2,
+            epochs=epochs,
+            batch_size=batch_size)
 
+        # Evaluación
+        loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+        mlflow.log_metric("test_loss", loss)
+        mlflow.log_metric("test_accuracy", accuracy)
 
-# corrida con parámetros diferentes a los por defecto
-# args = parser.parse_args(["--batch_size", '256', '--epochs', '8'])
-(experimentID, runID) = run_mlflow()
-print("MLflow Run completed with run_id {} and experiment_id {}".format(runID, experimentID))
-print(tf.__version__)
-print("-" * 100)
+        # Guardar modelo y preprocesador
+        signature = infer_signature(X_train, model.predict(X_train))
+        # input_example = X_train[:5]
+        mlflow.keras.log_model(
+            model, 
+            artifact_path="performance_ingles_v1",
+            signature=signature
+            # input_example=input_example
+            )
+        # Puedes también guardar el preprocessor como artefacto:
+        joblib.dump(preprocessor, "preprocessor.pkl")
+        mlflow.log_artifact("preprocessors/preprocessor.pkl")
+
+        print(f"Test accuracy: {accuracy:.4f}")
+
+if __name__ == '__main__':
+    process()

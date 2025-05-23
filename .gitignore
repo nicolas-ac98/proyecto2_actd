@@ -2,3 +2,5 @@ data/
 bin/eda_inicial.ipynb
 bin/EDA_report.html
 bin/notas.txt
+bin/mlruns/
+bin/preprocessors/
