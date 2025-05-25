@@ -11,6 +11,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from mlflow.models.signature import infer_signature
 import joblib
+from sklearn.metrics import classification_report, roc_auc_score
+import numpy as np
 
 
 def process(epochs=10, batch_size=32, learning_rate=0.001):
@@ -21,8 +23,6 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
     # Dividir el conjunto en variable de interes y predictores
     interest_variable = 'DESEMP_INGLES'
     X = df.drop(interest_variable, axis=1)
-
-    print(df.groupby([interest_variable]).size())
 
     y_processed = tf.keras.utils.to_categorical(df[interest_variable], num_classes=5)
     print("Se cargo el conjunto de datos")
@@ -65,9 +65,10 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
 
     # 5. Construir el modelo
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
-        tf.keras.layers.Dense(16,  activation='relu'),
-        tf.keras.layers.Dense(5,  activation=tf.nn.softmax)
+        tf.keras.layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
+        tf.keras.layers.Dense(64,  activation='relu'),
+        tf.keras.layers.Dense(32,  activation='relu'),
+        tf.keras.layers.Dense(5,  activation='softmax')
     ])
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
@@ -76,11 +77,10 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
     
-    experiment = mlflow.set_experiment("Test_ingles")
-    # mlflow.set_tracking_uri('http://localhost:5001')
+    experiment = mlflow.set_experiment("English performance model")
     
      # 6. Run de MLflow
-    with mlflow.start_run(run_name="pmv",
+    with mlflow.start_run(run_name="pmv_v3",
                           experiment_id=experiment.experiment_id):
         # Parámetros
         mlflow.log_param("epochs", epochs)
@@ -98,25 +98,55 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
             batch_size=batch_size)
 
         # Evaluación
+        # accuracy
         loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
         mlflow.log_metric("test_loss", loss)
         mlflow.log_metric("test_accuracy", accuracy)
 
+        # accuracy
+        # 1. Obtener predicciones de clases (no probabilidades)
+        y_pred_probs = model.predict(X_test)
+        y_pred_classes = np.argmax(y_pred_probs, axis=1)
+        y_true_classes = np.argmax(y_test, axis=1)
+
+        # 2. Reporte de clasificación
+        report = classification_report(y_true_classes, y_pred_classes, output_dict=True)
+
+        # Log de métricas clave
+        mlflow.log_metric("precision_macro", report["macro avg"]["precision"])
+        mlflow.log_metric("recall_macro", report["macro avg"]["recall"])
+        mlflow.log_metric("f1_macro", report["macro avg"]["f1-score"])
+
+        for i in range(0,5):
+
+            cat = ['a-less','a1','a2','b1','b-plus']
+
+            mlflow.log_metric("precision_" + cat[i], report[str(i)]["precision"])
+            mlflow.log_metric("recall_" + cat[i], report[str(i)]["recall"])
+            mlflow.log_metric("f1_" + cat[i], report[str(i)]["f1-score"])
+
+        # 3. ROC AUC para cada clase (multiclase)
+        try:
+            auc = roc_auc_score(y_test, y_pred_probs, multi_class="ovr")
+            mlflow.log_metric("roc_auc_ovr", auc)
+        except ValueError as e:
+            print(f"ROC AUC no calculado: {e}")
+            
         # Guardar modelo y preprocesador
         signature = infer_signature(X_train, model.predict(X_train))
         input_example = X[:5]
         input_example.to_csv("../data/input_example_v1.csv")
         mlflow.keras.log_model(
             model, 
-            artifact_path="performance_ingles_v1",
+            artifact_path="english_performance_model_v1",
             signature=signature
             # input_example=input_example
             )
         # Puedes también guardar el preprocessor como artefacto:
-        joblib.dump(preprocessor, "preprocessor.pkl")
-        mlflow.log_artifact("preprocessors/preprocessor.pkl")
+        joblib.dump(preprocessor, "preprocessors/english_performance_preprocessor_v1.pkl")
+        mlflow.log_artifact("english_performance_preprocessor_v1.pkl")
 
         print(f"Test accuracy: {accuracy:.4f}")
 
 if __name__ == '__main__':
-    process()
+    process(epochs=10)

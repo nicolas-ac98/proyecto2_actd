@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Users/nicolas.arrieta/projects/proyecto2_actd/bin/mlruns/677085266698086343/4a999ecce5e8457991730b204139f109/artifacts
+deleted_time: 1748113822952
+end_time: 1748002792868
+entry_point_name: ''
+experiment_id: '677085266698086343'
+lifecycle_stage: deleted
+run_id: 4a999ecce5e8457991730b204139f109
+run_name: pmv
+run_uuid: 4a999ecce5e8457991730b204139f109
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748001924108
+status: 3
+tags: []
+user_id: nicolas.arrieta
