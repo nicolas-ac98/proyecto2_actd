@@ -80,7 +80,7 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
     experiment = mlflow.set_experiment("English performance model")
     
      # 6. Run de MLflow
-    with mlflow.start_run(run_name="pmv_v3",
+    with mlflow.start_run(run_name="pmv_v4",
                           experiment_id=experiment.experiment_id):
         # Parámetros
         mlflow.log_param("epochs", epochs)
@@ -149,4 +149,4 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
         print(f"Test accuracy: {accuracy:.4f}")
 
 if __name__ == '__main__':
-    process(epochs=10)
+    process(epochs=30)

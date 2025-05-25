@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/nicolas.arrieta/projects/proyecto2_actd/bin/mlruns/245520022635495680/11cebe7eb4c540019f4b3f6247f14d0e/artifacts
+end_time: 1748149180187
+entry_point_name: ''
+experiment_id: '245520022635495680'
+lifecycle_stage: active
+run_id: 11cebe7eb4c540019f4b3f6247f14d0e
+run_name: pmv_v4
+run_uuid: 11cebe7eb4c540019f4b3f6247f14d0e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748146617392
+status: 4
+tags: []
+user_id: nicolas.arrieta

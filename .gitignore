@@ -1,4 +1,5 @@
-data/
+data/*
+!data/input_request.json
 bin/eda_inicial.ipynb
 bin/EDA_report.html
 bin/notas.txt
