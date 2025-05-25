@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 import json
 import numpy as np
+from tensorflow import keras
 
 def new_estimation(new_data, version_model = 'pmv_v3', preprocessor='preprocessors/english_performance_preprocessor_v1.pkl'):
     # Cargar el preprocesador
@@ -19,7 +20,7 @@ def new_estimation(new_data, version_model = 'pmv_v3', preprocessor='preprocesso
     run_id = run.run_id
 
     # Cargar el modelo del run
-    model = mlflow.keras.load_model(f"runs:/{run_id}/english_performance_model_v1")
+    model = keras.models.load_model(f"modelo_v7.keras")
 
     # Aplicar el preprocesador
     new_data_processed = preprocessor.transform(new_data)
