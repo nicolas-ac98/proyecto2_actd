@@ -1,0 +1,218 @@
+[
+    {
+        "label": "COLOMBIA",
+        "value": "colombia"
+    },
+    {
+        "label": "VENEZUELA",
+        "value": "venezuela"
+    },
+    {
+        "label": "ESPAÑA",
+        "value": "espana"
+    },
+    {
+        "label": "FRANCIA",
+        "value": "francia"
+    },
+    {
+        "label": "ALEMANIA",
+        "value": "alemania"
+    },
+    {
+        "label": "COREA DEL SUR",
+        "value": "corea_del_sur"
+    },
+    {
+        "label": "ESTADOS UNIDOS",
+        "value": "estados_unidos"
+    },
+    {
+        "label": "REINO UNIDO",
+        "value": "reino_unido"
+    },
+    {
+        "label": "MÉXICO",
+        "value": "mexico"
+    },
+    {
+        "label": "ECUADOR",
+        "value": "ecuador"
+    },
+    {
+        "label": "ARGENTINA",
+        "value": "argentina"
+    },
+    {
+        "label": "ITALIA",
+        "value": "italia"
+    },
+    {
+        "label": "CHILE",
+        "value": "chile"
+    },
+    {
+        "label": "CUBA",
+        "value": "cuba"
+    },
+    {
+        "label": "SUIZA",
+        "value": "suiza"
+    },
+    {
+        "label": "EL SALVADOR",
+        "value": "el_salvador"
+    },
+    {
+        "label": "PERÚ",
+        "value": "peru"
+    },
+    {
+        "label": "ARGELIA",
+        "value": "argelia"
+    },
+    {
+        "label": "BELICE",
+        "value": "belice"
+    },
+    {
+        "label": "COMORAS",
+        "value": "comoras"
+    },
+    {
+        "label": "CHAD",
+        "value": "chad"
+    },
+    {
+        "label": "COREA DEL NORTE",
+        "value": "corea_del_norte"
+    },
+    {
+        "label": "BRASIL",
+        "value": "brasil"
+    },
+    {
+        "label": "ANTÁRTIDA",
+        "value": "antartida"
+    },
+    {
+        "label": "OMÁN",
+        "value": "oman"
+    },
+    {
+        "label": "PANAMÁ",
+        "value": "panama"
+    },
+    {
+        "label": "CABO VERDE",
+        "value": "cabo_verde"
+    },
+    {
+        "label": "CROACIA",
+        "value": "croacia"
+    },
+    {
+        "label": "COSTA RICA",
+        "value": "costa_rica"
+    },
+    {
+        "label": "ARMENIA",
+        "value": "armenia"
+    },
+    {
+        "label": "PARAGUAY",
+        "value": "paraguay"
+    },
+    {
+        "label": "BOLIVIA",
+        "value": "bolivia"
+    },
+    {
+        "label": "CIUDAD DEL VATICANO",
+        "value": "ciudad_del_vaticano"
+    },
+    {
+        "label": "NAMIBIA",
+        "value": "namibia"
+    },
+    {
+        "label": "BULGARIA",
+        "value": "bulgaria"
+    },
+    {
+        "label": "ANDORRA",
+        "value": "andorra"
+    },
+    {
+        "label": "ISLAS SALOMÓN",
+        "value": "islas_salomon"
+    },
+    {
+        "label": "LAOS - REPÚBLICA DEMOCRÁTICA POPULAR LAO",
+        "value": "laos_-_republica_democratica_popular_lao"
+    },
+    {
+        "label": "PAÍSES BAJOS - HOLANDA",
+        "value": "paises_bajos_-_holanda"
+    },
+    {
+        "label": "URUGUAY",
+        "value": "uruguay"
+    },
+    {
+        "label": "JAPÓN",
+        "value": "japon"
+    },
+    {
+        "label": "CHINA",
+        "value": "china"
+    },
+    {
+        "label": "SUDÁFRICA",
+        "value": "sudafrica"
+    },
+    {
+        "label": "NICARAGUA",
+        "value": "nicaragua"
+    },
+    {
+        "label": "BURUNDI",
+        "value": "burundi"
+    },
+    {
+        "label": "ARABIA SAUDITA",
+        "value": "arabia_saudita"
+    },
+    {
+        "label": "REPÚBLICA DOMINICANA",
+        "value": "republica_dominicana"
+    },
+    {
+        "label": "FILIPINAS",
+        "value": "filipinas"
+    },
+    {
+        "label": "TAIWAN",
+        "value": "taiwan"
+    },
+    {
+        "label": "UCRANIA",
+        "value": "ucrania"
+    },
+    {
+        "label": "ARUBA",
+        "value": "aruba"
+    },
+    {
+        "label": "EMIRATOS ÁRABES UNIDOS",
+        "value": "emiratos_arabes_unidos"
+    },
+    {
+        "label": "ETIOPÍA",
+        "value": "etiopia"
+    },
+    {
+        "label": "DINAMARCA",
+        "value": "dinamarca"
+    }
+]

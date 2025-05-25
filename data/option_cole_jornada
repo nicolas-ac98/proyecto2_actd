@@ -1,0 +1,26 @@
+[
+    {
+        "label": "MAÑANA",
+        "value": "manana"
+    },
+    {
+        "label": "COMPLETA",
+        "value": "completa"
+    },
+    {
+        "label": "SABATINA",
+        "value": "sabatina"
+    },
+    {
+        "label": "NOCHE",
+        "value": "noche"
+    },
+    {
+        "label": "TARDE",
+        "value": "tarde"
+    },
+    {
+        "label": "UNICA",
+        "value": "unica"
+    }
+]

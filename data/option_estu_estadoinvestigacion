@@ -1,0 +1,14 @@
+[
+    {
+        "label": "PUBLICAR",
+        "value": "publicar"
+    },
+    {
+        "label": "PRESENTE CON LECTURA TARDIA",
+        "value": "presente_con_lectura_tardia"
+    },
+    {
+        "label": "VALIDEZ OFICINA JURÍDICA",
+        "value": "validez_oficina_juridica"
+    }
+]

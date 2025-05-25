@@ -1,0 +1,14 @@
+[
+    {
+        "label": "ACADÉMICO",
+        "value": "academico"
+    },
+    {
+        "label": "TÉCNICO",
+        "value": "tecnico"
+    },
+    {
+        "label": "TÉCNICO/ACADÉMICO",
+        "value": "tecnico/academico"
+    }
+]

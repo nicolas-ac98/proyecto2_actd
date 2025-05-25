@@ -1,0 +1,14 @@
+[
+    {
+        "label": "MIXTO",
+        "value": "mixto"
+    },
+    {
+        "label": "FEMENINO",
+        "value": "femenino"
+    },
+    {
+        "label": "MASCULINO",
+        "value": "masculino"
+    }
+]

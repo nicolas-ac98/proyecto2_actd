@@ -80,7 +80,7 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
     experiment = mlflow.set_experiment("English performance model")
     
      # 6. Run de MLflow
-    with mlflow.start_run(run_name="pmv_v4",
+    with mlflow.start_run(run_name="pmv_v5",
                           experiment_id=experiment.experiment_id):
         # Parámetros
         mlflow.log_param("epochs", epochs)
@@ -143,10 +143,10 @@ def process(epochs=10, batch_size=32, learning_rate=0.001):
             # input_example=input_example
             )
         # Puedes también guardar el preprocessor como artefacto:
-        joblib.dump(preprocessor, "preprocessors/english_performance_preprocessor_v1.pkl")
+        joblib.dump(preprocessor, "english_performance_preprocessor_v1.pkl")
         mlflow.log_artifact("english_performance_preprocessor_v1.pkl")
 
         print(f"Test accuracy: {accuracy:.4f}")
 
 if __name__ == '__main__':
-    process(epochs=30)
+    process(epochs=15, learning_rate=0.01)

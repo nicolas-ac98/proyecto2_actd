@@ -1,0 +1,134 @@
+[
+    {
+        "label": "BOGOTA",
+        "value": "bogota"
+    },
+    {
+        "label": "CUNDINAMARCA",
+        "value": "cundinamarca"
+    },
+    {
+        "label": "ANTIOQUIA",
+        "value": "antioquia"
+    },
+    {
+        "label": "VALLE",
+        "value": "valle"
+    },
+    {
+        "label": "BOLIVAR",
+        "value": "bolivar"
+    },
+    {
+        "label": "RISARALDA",
+        "value": "risaralda"
+    },
+    {
+        "label": "HUILA",
+        "value": "huila"
+    },
+    {
+        "label": "CALDAS",
+        "value": "caldas"
+    },
+    {
+        "label": "CESAR",
+        "value": "cesar"
+    },
+    {
+        "label": "CAUCA",
+        "value": "cauca"
+    },
+    {
+        "label": "META",
+        "value": "meta"
+    },
+    {
+        "label": "TOLIMA",
+        "value": "tolima"
+    },
+    {
+        "label": "LA GUAJIRA",
+        "value": "la_guajira"
+    },
+    {
+        "label": "SANTANDER",
+        "value": "santander"
+    },
+    {
+        "label": "QUINDIO",
+        "value": "quindio"
+    },
+    {
+        "label": "CASANARE",
+        "value": "casanare"
+    },
+    {
+        "label": "ATLANTICO",
+        "value": "atlantico"
+    },
+    {
+        "label": "NARIÑO",
+        "value": "narino"
+    },
+    {
+        "label": "MAGDALENA",
+        "value": "magdalena"
+    },
+    {
+        "label": "BOYACA",
+        "value": "boyaca"
+    },
+    {
+        "label": "NORTE SANTANDER",
+        "value": "norte_santander"
+    },
+    {
+        "label": "ARAUCA",
+        "value": "arauca"
+    },
+    {
+        "label": "CHOCO",
+        "value": "choco"
+    },
+    {
+        "label": "CORDOBA",
+        "value": "cordoba"
+    },
+    {
+        "label": "SUCRE",
+        "value": "sucre"
+    },
+    {
+        "label": "PUTUMAYO",
+        "value": "putumayo"
+    },
+    {
+        "label": "GUAVIARE",
+        "value": "guaviare"
+    },
+    {
+        "label": "CAQUETA",
+        "value": "caqueta"
+    },
+    {
+        "label": "GUAINIA",
+        "value": "guainia"
+    },
+    {
+        "label": "AMAZONAS",
+        "value": "amazonas"
+    },
+    {
+        "label": "SAN ANDRES",
+        "value": "san_andres"
+    },
+    {
+        "label": "VICHADA",
+        "value": "vichada"
+    },
+    {
+        "label": "VAUPES",
+        "value": "vaupes"
+    }
+]

@@ -1,0 +1,46 @@
+[
+    {
+        "label": "Técnica o tecnológica completa",
+        "value": "tecnica_o_tecnologica_completa"
+    },
+    {
+        "label": "Educación profesional completa",
+        "value": "educacion_profesional_completa"
+    },
+    {
+        "label": "Secundaria (Bachillerato) incompleta",
+        "value": "secundaria_(bachillerato)_incompleta"
+    },
+    {
+        "label": "Secundaria (Bachillerato) completa",
+        "value": "secundaria_(bachillerato)_completa"
+    },
+    {
+        "label": "Primaria completa",
+        "value": "primaria_completa"
+    },
+    {
+        "label": "Postgrado",
+        "value": "postgrado"
+    },
+    {
+        "label": "Ninguno",
+        "value": "ninguno"
+    },
+    {
+        "label": "Primaria incompleta",
+        "value": "primaria_incompleta"
+    },
+    {
+        "label": "No sabe",
+        "value": "no_sabe"
+    },
+    {
+        "label": "Educación profesional incompleta",
+        "value": "educacion_profesional_incompleta"
+    },
+    {
+        "label": "Técnica o tecnológica incompleta",
+        "value": "tecnica_o_tecnologica_incompleta"
+    }
+]

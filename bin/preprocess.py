@@ -5,8 +5,10 @@ import unidecode
 
 def process():
     # Dataset ---------------------------------------------------------
-    df = pd.read_csv("../data/Base de Datos - Icfes.zip")
+    df_origin = pd.read_csv("../data/Base de Datos - Icfes.zip")
     print("Carga correcta de los datos")
+
+    df = df_origin.copy()
     
     # Tranformacion de variables
     # standarize_number_variables(df)
@@ -21,11 +23,9 @@ def process():
     df = df.drop_duplicates()
     # Guardar archivo
     print("Guardar archivo")
-    df.to_csv("../data/dataset_v1.csv.zip",index=False)
+    # df.to_csv("../data/dataset_v1.csv.zip",index=False)
 
-    print(df.columns)
-
-    print(df.head())
+    get_values_for_app(df_origin=df_origin, df=df)
 
 # funciones
 def drop_variables(df):
@@ -187,6 +187,44 @@ def standarize_categorical_variables(df):
 def standarize_binary(df, variable, new_variable, true_condition):
     df[new_variable] = (df[variable] == true_condition).astype(int)
     df.drop([variable], axis=1, inplace=True)
+
+
+def get_values_for_app(df_origin, df):
+
+    df = df.add_prefix('preprocess_')
+
+    df_merged = pd.concat([df_origin, df], axis=1)
+
+    # print(df_merged.columns)
+
+    cat_cols = [
+        'COLE_CARACTER', 'COLE_DEPTO_UBICACION', 'COLE_GENERO', 'COLE_JORNADA',
+        'ESTU_ESTADOINVESTIGACION', 'ESTU_NACIONALIDAD', 'FAMI_EDUCACIONMADRE',
+        'FAMI_EDUCACIONPADRE'
+        ]
+
+    num_cols = ['ESTRATOVIVIENDA', 'CUARTOSHOGAR', 'PERSONASHOGAR']
+
+    bin_cols = [
+        'COLE_AREA_URBANO', 'BILINGUE', 'CALEN_A', 'COLE_OFICIAL', 
+        'SEDE_PRINCIPAL', 'SEXO_FEM','TIENE_AUTOMOVIL', 'TIENE_COMPUTADOR', 
+        'TIENE_INTERNET','TIENE_LAVADORA'
+        ]
+    
+    for category in cat_cols:
+        format_labels(df_merged,category)
+
+
+def format_labels(df, variable):
+    preprocess_variable = 'preprocess_' + variable
+    unique_values = df[[variable,preprocess_variable]].drop_duplicates()
+    
+    unique_values = unique_values.rename(columns={variable: 'label', preprocess_variable: 'value'})
+
+    # Convertir a lista de diccionarios
+    unique_values.to_json("../data/option_"+ str.lower(variable), orient="records", force_ascii=False)
+
+    # print(unique_values)
 
 if __name__ == '__main__':
     process()
