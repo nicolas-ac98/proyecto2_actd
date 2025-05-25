@@ -134,12 +134,12 @@ def standarize_categorical_variables(df):
                       true_condition='si')
     
     df['ESTRATOVIVIENDA'] = df['FAMI_ESTRATOVIVIENDA'].map({
-            'estrato 1': 1,
-            'estrato 2': 2,
-            'estrato 3': 3,
-            'estrato 4': 4,
-            'estrato 5': 5,
-            'estrato 6': 6
+            'estrato_1': 1,
+            'estrato_2': 2,
+            'estrato_3': 3,
+            'estrato_4': 4,
+            'estrato_5': 5,
+            'estrato_6': 6
         }).fillna(0)
     
     df.drop(['FAMI_ESTRATOVIVIENDA'], axis=1, inplace=True)
@@ -214,9 +214,25 @@ def get_values_for_app(df_origin, df):
     for category in cat_cols:
         format_labels(df_merged,category)
 
+    for preprocess_variable in num_cols:
 
-def format_labels(df, variable):
-    preprocess_variable = 'preprocess_' + variable
+        if preprocess_variable == 'ESTRATOVIVIENDA':
+            variable = 'FAMI_ESTRATOVIVIENDA' 
+        elif preprocess_variable == 'CUARTOSHOGAR':
+            variable = 'FAMI_CUARTOSHOGAR'
+        elif preprocess_variable == 'PERSONASHOGAR':
+            variable = 'FAMI_PERSONASHOGAR'
+
+        format_labels(df_merged,variable=variable, preprocess_variable=preprocess_variable)
+
+
+def format_labels(df, variable, preprocess_variable = ''):
+    
+    if preprocess_variable == '':
+        preprocess_variable = 'preprocess_' + variable
+    else:
+        preprocess_variable = 'preprocess_' + preprocess_variable
+    
     unique_values = df[[variable,preprocess_variable]].drop_duplicates()
     
     unique_values = unique_values.rename(columns={variable: 'label', preprocess_variable: 'value'})

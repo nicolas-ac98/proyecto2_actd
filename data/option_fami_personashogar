@@ -1,0 +1,50 @@
+[
+    {
+        "label": "Tres",
+        "value": 3.0
+    },
+    {
+        "label": "Cinco",
+        "value": 5.0
+    },
+    {
+        "label": "Cuatro",
+        "value": 4.0
+    },
+    {
+        "label": "Siete",
+        "value": 7.0
+    },
+    {
+        "label": "Dos",
+        "value": 2.0
+    },
+    {
+        "label": "Seis",
+        "value": 6.0
+    },
+    {
+        "label": "Diez",
+        "value": 10.0
+    },
+    {
+        "label": "Una",
+        "value": 1.0
+    },
+    {
+        "label": "Ocho",
+        "value": 8.0
+    },
+    {
+        "label": "Nueve",
+        "value": 9.0
+    },
+    {
+        "label": "Once",
+        "value": 11.0
+    },
+    {
+        "label": "Doce o más",
+        "value": 12.0
+    }
+]
