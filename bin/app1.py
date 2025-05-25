@@ -4,6 +4,11 @@ import pandas as pd
 import plotly.express as px
 import requests
 import json
+import os
+from model_load import new_estimation
+from dash import callback_context
+import mlflow
+
 
 # Carga de datos
 df = pd.read_csv("Base_de_Datos_Icfes.csv")
@@ -17,6 +22,29 @@ map_nombres = {
     'SAN ANDRES': 'ARCHIPIELAGO DE SAN ANDRES PROVIDENCIA Y SANTA CATALINA'
 }
 
+
+with open("../data/option_cole_caracter", encoding="utf-8") as f:
+    option_cole_caracter = json.load(f)
+
+with open("../data/option_cole_depto_ubicacion", encoding="utf-8") as f:
+    option_cole_depto_ubicacion = json.load(f)
+
+with open("../data/option_cole_genero", encoding="utf-8") as f:
+    option_cole_genero = json.load(f)
+
+with open("../data/option_estu_estadoinvestigacion", encoding="utf-8") as f:
+    option_estu_estadoinvestigacion = json.load(f)
+
+with open("../data/option_estu_nacionalidad", encoding="utf-8") as f:
+    option_estu_nacionalidad = json.load(f)
+
+opciones_categoricas = {
+    'COLE_CARACTER': option_cole_caracter,
+    'COLE_DEPTO_UBICACION': option_cole_depto_ubicacion,
+    'COLE_GENERO': option_cole_genero,
+    'ESTU_ESTADOINVESTIGACION': option_estu_estadoinvestigacion,
+    'ESTU_NACIONALIDAD': option_estu_nacionalidad
+}
 # Cargar GeoJSON
 geo_url = "https://gist.githubusercontent.com/john-guerra/43c7656821069d00dcbc/raw/3aadedf47badbdac823b00dbe259f6bc6d9e1899/colombia.geo.json"
 geojson_colombia = requests.get(geo_url).json()
@@ -26,12 +54,17 @@ niveles = ['A-', 'A1', 'A2', 'B1', 'B+']
 
 # Simulación de valores adicionales y sus tipos
 defaults = {
-    'UBICADO_URBANO': 'Sí', 'BILINGUE': 'No', 'CALENDARIO_A': 'Sí', 'SEDE_PRINCIPAL': 'Sí',
-    'SEXO': 'Femenino', 'LAVADORA': 'Sí', 'ESTRATO': 3, 'CUARTOS_HOGAR': 4
+    'COLE_AREA_URBANO': 1, 'BILINGUE': 0, 'CALEN_A': 1, 'SEDE_PRINCIPAL': 1,
+    'SEXO_FEM': 1, 'TIENE_LAVADORA': 1, 'ESTRATOVIVIENDA': 1, 'CUARTOSHOGAR': 4, 'ESTU_NACIONALIDAD': 'colombia',
+    'COLE_CARACTER': 'academico', 'COLE_DEPTO_UBICACION': 'bogota', 'COLE_GENERO': 'mixto',
+    'TIENE_AUTOMOVIL': 0, 'ESTU_ESTADOINVESTIGACION': 'publicar'
+
 }
 tipo_variable = {
-    'UBICADO_URBANO': 'binaria', 'BILINGUE': 'binaria', 'CALENDARIO_A': 'binaria', 'SEDE_PRINCIPAL': 'binaria',
-    'SEXO': 'binaria', 'LAVADORA': 'binaria', 'ESTRATO': 'numerica', 'CUARTOS_HOGAR': 'numerica'
+    'COLE_AREA_URBANO': 'binaria', 'BILINGUE': 'binaria', 'CALEN_A': 'binaria', 'SEDE_PRINCIPAL': 'binaria',
+    'SEXO': 'binaria', 'TIENE_LAVADORA': 'binaria', 'ESTRATOVIVIENDA': 'numerica', 'CUARTOSHOGAR': 'numerica', 'ESTU_NACIONALIDAD': 'categorica',
+    'COLE_CARACTER': 'categorica', 'COLE_DEPTO_UBICACION': 'categorica', 'COLE_GENERO': 'categorica',
+    'TIENE_AUTOMOVIL': 'binaria','ESTU_ESTADOINVESTIGACION': 'categorica'
 }
 
 # APP
@@ -65,28 +98,165 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.Label("Cuenta con Internet:"),
-            dcc.Dropdown(id='input-internet', options=[{'label': i, 'value': i} for i in ['Sí', 'No']], style={'width': '100%'})
+            dcc.Dropdown(id='input-internet', options=[
+                    {"label": "Sí", "value": 1},
+                    {"label": "No", "value": 0}
+                ],
+                placeholder='Cuenta con Internet',
+                style={'width': '100%'})
         ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
         html.Div([
             html.Label("Colegio Oficial:"),
-            dcc.Dropdown(id='input-oficial', options=[{'label': i, 'value': i} for i in ['Sí', 'No']], style={'width': '100%'})
+            dcc.Dropdown(id='input-oficial', options=[
+                    {"label": "Sí", "value": 1},
+                    {"label": "No", "value": 0}
+                ],
+                placeholder='Es Colegio Oficial',
+                style={'width': '100%'})
         ], style={'width': '48%', 'display': 'inline-block', 'marginLeft': '4%'}),
         html.Div([
             html.Label("Tiene computador:"),
-            dcc.Dropdown(id='input-pc', options=[{'label': i, 'value': i} for i in ['Sí', 'No']], style={'width': '100%'})
+            dcc.Dropdown(id='input-pc', options=[
+                    {"label": "Sí", "value": 1},
+                    {"label": "No", "value": 0}
+                ],
+                placeholder='Tiene Computador',
+                style={'width': '100%'})
         ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
         html.Div([
             html.Label("Jornada:"),
-            dcc.Dropdown(id='input-jornada', options=[{'label': j, 'value': j} for j in ['Completa', 'Mañana', 'Tarde', 'Noche']], style={'width': '100%'})
+            dcc.Dropdown(id='input-jornada', options=[
+                    {
+                        "label": "MAÑANA",
+                        "value": "manana"
+                    },
+                    {
+                        "label": "COMPLETA",
+                        "value": "completa"
+                    },
+                    {
+                        "label": "SABATINA",
+                        "value": "sabatina"
+                    },
+                    {
+                        "label": "NOCHE",
+                        "value": "noche"
+                    },
+                    {
+                        "label": "TARDE",
+                        "value": "tarde"
+                    },
+                    {
+                        "label": "UNICA",
+                        "value": "unica"
+                    }
+                ],
+                placeholder='Jornada que Cursaba',
+                style={'width': '100%'})
         ], style={'width': '48%', 'display': 'inline-block', 'marginLeft': '4%'}),
         html.Div([
             html.Label("Educación de la madre:"),
-            dcc.Dropdown(id='input-edu-madre', options=[{'label': e, 'value': e} for e in ['Ninguna', 'Básica', 'Media', 'Técnica', 'Superior']], style={'width': '100%'})
-        ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+            dcc.Dropdown(id='input-edu-madre',options=[
+                    {
+                        "label": "Técnica o tecnológica completa",
+                        "value": "tecnica_o_tecnologica_completa"
+                    },
+                    {
+                        "label": "Educación profesional completa",
+                        "value": "educacion_profesional_completa"
+                    },
+                    {
+                        "label": "Secundaria (Bachillerato) completa",
+                        "value": "secundaria_(bachillerato)_completa"
+                    },
+                    {
+                        "label": "Primaria incompleta",
+                        "value": "primaria_incompleta"
+                    },
+                    {
+                        "label": "Postgrado",
+                        "value": "postgrado"
+                    },
+                    {
+                        "label": "No sabe",
+                        "value": "no_sabe"
+                    },
+                    {
+                        "label": "Ninguno",
+                        "value": "ninguno"
+                    },
+                    {
+                        "label": "Primaria completa",
+                        "value": "primaria_completa"
+                    },
+                    {
+                        "label": "Secundaria (Bachillerato) incompleta",
+                        "value": "secundaria_(bachillerato)_incompleta"
+                    },
+                    {
+                        "label": "Técnica o tecnológica incompleta",
+                        "value": "tecnica_o_tecnologica_incompleta"
+                    },
+                    {
+                        "label": "Educación profesional incompleta",
+                        "value": "educacion_profesional_incompleta"
+                    }
+                ],
+                placeholder='Educación de la madre',
+                style={'width': '100%'}
+            )], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
         html.Div([
             html.Label("Educación del padre:"),
-            dcc.Dropdown(id='input-edu-padre', options=[{'label': e, 'value': e} for e in ['Ninguna', 'Básica', 'Media', 'Técnica', 'Superior']], style={'width': '100%'})
-        ], style={'width': '48%', 'display': 'inline-block', 'marginLeft': '4%'}),
+            dcc.Dropdown(id='input-edu-padre', 
+            options=[
+                {
+                    "label": "Técnica o tecnológica completa",
+                    "value": "tecnica_o_tecnologica_completa"
+                },
+                {
+                    "label": "Educación profesional completa",
+                    "value": "educacion_profesional_completa"
+                },
+                {
+                    "label": "Secundaria (Bachillerato) completa",
+                    "value": "secundaria_(bachillerato)_completa"
+                },
+                {
+                    "label": "Primaria incompleta",
+                    "value": "primaria_incompleta"
+                },
+                {
+                    "label": "Postgrado",
+                    "value": "postgrado"
+                },
+                {
+                    "label": "No sabe",
+                    "value": "no_sabe"
+                },
+                {
+                    "label": "Ninguno",
+                    "value": "ninguno"
+                },
+                {
+                    "label": "Primaria completa",
+                    "value": "primaria_completa"
+                },
+                {
+                    "label": "Secundaria (Bachillerato) incompleta",
+                    "value": "secundaria_(bachillerato)_incompleta"
+                },
+                {
+                    "label": "Técnica o tecnológica incompleta",
+                    "value": "tecnica_o_tecnologica_incompleta"
+                },
+                {
+                    "label": "Educación profesional incompleta",
+                    "value": "educacion_profesional_incompleta"
+                }
+                ],
+                placeholder='Educación de la padre',
+                style={'width': '100%'}
+            )], style={'width': '48%', 'display': 'inline-block', 'marginLeft': '4%'}),
         html.Div([
             html.Label("Personas en el hogar:"),
             dcc.Dropdown(id='input-personas-hogar', options=[{'label': str(i), 'value': i} for i in range(1, 21)], placeholder='Seleccione una cantidad', style={'width': '100%'})
@@ -258,32 +428,57 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     if resumen_actual is None:
         resumen_actual = []
 
-    #Crear nuevo campo si no existe
+    # Crear nuevo campo si no existe
     campos_ids = [c['props']['id'] if isinstance(c, dict) else getattr(c, 'id', None) for c in campos_actuales]
     if variable and f'adicional-{variable}' not in campos_ids:
-        nuevo_input = dcc.Dropdown(
-            id={'type': 'dynamic-input', 'index': variable},
-            options=[{'label': 'Sí', 'value': 'Sí'}, {'label': 'No', 'value': 'No'}],
-            placeholder=variable.replace('_', ' ').title(),
-            style={'width': '100%'}
-        ) if tipo_variable[variable] == 'binaria' else dcc.Input(
-            id={'type': 'dynamic-input', 'index': variable},
-            type='number', min=1, max=10,
-            placeholder=variable.replace('_', ' ').title(),
-            style={'width': '100%'}
-        )
+        # === SECCIÓN MODIFICADA PARA DISTINTOS TIPOS ===
+        if tipo_variable[variable] == 'binaria':
+            nuevo_input = dcc.Dropdown(
+                id={'type': 'dynamic-input', 'index': variable},
+                options=[{'label': 'Sí', 'value': 1}, {'label': 'No', 'value': 0}],
+                placeholder=variable.replace('_', ' ').title(),
+                style={'width': '100%'}
+            )
+        elif tipo_variable[variable] == 'numerica':
+            nuevo_input = dcc.Input(
+                id={'type': 'dynamic-input', 'index': variable},
+                type='number',
+                placeholder=variable.replace('_', ' ').title(),
+                style={'width': '100%'}
+            )
+        elif tipo_variable[variable] == 'categorica':
+            nuevo_input = dcc.Dropdown(
+                id={'type': 'dynamic-input', 'index': variable},
+                options=opciones_categoricas.get(variable, []),
+                placeholder=variable.replace('_', ' ').title(),
+                style={'width': '100%'}
+            )
+        else:
+            nuevo_input = dcc.Input(
+                id={'type': 'dynamic-input', 'index': variable},
+                type='text',
+                placeholder=variable.replace('_', ' ').title(),
+                style={'width': '100%'}
+            )
 
         grupo = html.Div([
             html.Label(variable.replace('_', ' ').title(), style={'display': 'block'}),
             nuevo_input
-        ], id=f'adicional-{variable}', style={'marginBottom': '10px', 'width': '48%', 'display': 'inline-block', 'marginRight': '2%'})
+        ], id=f'adicional-{variable}', style={
+            'marginBottom': '10px',
+            'width': '48%',
+            'display': 'inline-block',
+            'marginRight': '2%'
+        })
 
         campos_actuales.append(grupo)
 
-        #línea vacía al resumen por defecto
-        resumen_actual.append(html.P(f"{variable.replace('_', ' ').title()}: Valor no especificado", id=f"resumen-{variable}"))
+        resumen_actual.append(html.P(
+            f"{variable.replace('_', ' ').title()}: Valor no especificado",
+            id=f"resumen-{variable}"
+        ))
 
-    #Actualiza resumen según todos los valores actuales
+    # Actualiza resumen según todos los valores actuales
     resumen_actualizado = []
     encontrados = set()
     for val, id_dict in zip(valores, ids):
@@ -292,6 +487,7 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
         texto = f"{nombre}: {val if val is not None else 'Valor no especificado'}"
         encontrados.add(variable_key)
         resumen_actualizado.append(html.P(texto, id=f"resumen-{variable_key}"))
+
     for resumen in resumen_actual:
         if hasattr(resumen, 'props') and 'id' in resumen.props:
             clave = resumen.props['id'].replace('resumen-', '')
@@ -316,26 +512,33 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     State({'type': 'dynamic-input', 'index': dash.dependencies.ALL}, 'id'),
     prevent_initial_call=True
 )
-def recolectar_variables(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_padre, personas, valores_adic, ids_adic):
-    #Variables obligatorias
-    data = {
-        'INTERNET': internet,
-        'COLEGIO_OFICIAL': oficial,
-        'TIENE_PC': pc,
-        'JORNADA': jornada,
-        'EDU_MADRE': edu_madre,
-        'EDU_PADRE': edu_padre,
-        'PERSONAS_HOGAR': personas
+def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_padre, personas, adicionales_valores, adicionales_ids):
+    if n_clicks == 0:
+        return ""
+
+    #Diccionario con los valores obligatorios
+    datos = {
+        'P1_INTERNET': internet,
+        'P2_COLE_OFICIAL': oficial,
+        'P3_PC': pc,
+        'P4_JORNADA': jornada,
+        'P5_EDU_MADRE': edu_madre,
+        'P6_EDU_PADRE': edu_padre,
+        'P7_PERSONAS_HOGAR': personas
     }
 
-    #Variables adicionales
-    adicionales = {i['index']: val if val is not None else defaults[i['index']] for val, i in zip(valores_adic, ids_adic)}
-    for clave in defaults:
-        if clave not in adicionales:
-            adicionales[clave] = defaults[clave]
-    data.update(adicionales)
-    return json.dumps(data, indent=2, ensure_ascii=False)
+    # Añadir los adicionales si existen
+    for val, id_ in zip(adicionales_valores, adicionales_ids):
+        clave = id_['index']
+        datos[clave] = val
 
+    # Convertir a DataFrame
+    df = pd.DataFrame([datos])
+
+    # Llamar la función de predicción
+    nivel, prob = new_estimation(df)
+
+    return f"Nivel de inglés predicho: {nivel}\nConfianza: {prob:.2%}"
 
 
 if __name__ == '__main__':
