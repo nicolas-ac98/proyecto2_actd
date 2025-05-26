@@ -497,7 +497,6 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     return campos_actuales, resumen_actualizado
 
 
-
 @app.callback(
     Output('output-variables', 'children'),
     Input('btn-predecir', 'n_clicks'),
@@ -513,32 +512,47 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     prevent_initial_call=True
 )
 def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_padre, personas, adicionales_valores, adicionales_ids):
-    if n_clicks == 0:
-        return ""
+    try:
+        if n_clicks == 0:
+            return ""
 
-    #Diccionario con los valores obligatorios
-    datos = {
-        'TIENE_INTERNET': internet,
-        'COLE_OFICIAL': oficial,
-        'TIENE_COMPUTADOR': pc,
-        'COLE_JORNADA': jornada,
-        'FAMI_EDUCACIONMADRE': edu_madre,
-        'FAMI_EDUCACIONPADRE': edu_padre,
-        'PERSONASHOGAR': personas
-    }
+        print("1 - Entró al callback")
 
-    # Añadir los adicionales si existen
-    for val, id_ in zip(adicionales_valores, adicionales_ids):
-        clave = id_['index']
-        datos[clave] = val
+        datos = {
+            'TIENE_INTERNET': internet,
+            'COLE_OFICIAL': oficial,
+            'TIENE_COMPUTADOR': pc,
+            'COLE_JORNADA': jornada,
+            'FAMI_EDUCACIONMADRE': edu_madre,
+            'FAMI_EDUCACIONPADRE': edu_padre,
+            'PERSONASHOGAR': personas
+        }
 
-    # Convertir a DataFrame
-    df = pd.DataFrame([datos])
+        print("2 - Obligatorios:", datos)
 
-    # Llamar la función de predicción
-    nivel, prob = new_estimation(df)
+        # Convertir adicionales a diccionario temporal
+        adicionales_dict = {id_['index']: val for val, id_ in zip(adicionales_valores, adicionales_ids)}
 
-    return f"Nivel de inglés predicho: {nivel}\nConfianza: {prob:.2%}"
+        # Asegurar que todas las variables adicionales estén presentes
+        for clave in defaults:
+            datos[clave] = adicionales_dict.get(clave, defaults[clave])
+
+
+        print("3 - Con adicionales:", datos)
+
+        df = pd.DataFrame([datos])
+        print("4 - DataFrame construido:", df)
+
+        # Llamar la función de predicción
+        nivel, prob = new_estimation(df)
+
+        print("5 - Predicción realizada")
+
+        return f"Nivel de inglés predicho: {nivel}\nConfianza: {prob:.2%}"
+
+    except Exception as e:
+        print("❌ Error en callback:", e)
+        return f"Error en predicción: {e}"
 
 
 if __name__ == '__main__':
