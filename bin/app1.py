@@ -8,7 +8,7 @@ from model_load import new_estimation
 
 
 # Carga de datos
-df = pd.read_csv("C:/Users/JESUS/OneDrive - Universidad de los andes/Maestría Ing Industrial/Analítica Computacional/Proyecto_2/Base de Datos - Icfes/Base2.csv")
+df = pd.read_csv("../data/Base de Datos - Icfes.zip")
 niveles_orden = ['A-', 'A1', 'A2', 'B1', 'B+']
 print('1')
 # Ajuste de nombres con el mapa
