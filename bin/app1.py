@@ -38,6 +38,24 @@ with open("../data/option_estu_estadoinvestigacion", encoding="utf-8") as f:
 with open("../data/option_estu_nacionalidad", encoding="utf-8") as f:
     option_estu_nacionalidad = json.load(f)
 print('2')
+
+nombres_amigables = {
+    'COLE_AREA_URBANO': 'Ubicación Urbana',
+    'BILINGUE': '¿Colegio Bilingüe?',
+    'CALEN_A': 'Colegio con Calendario A',
+    'SEDE_PRINCIPAL': '¿Es Sede Principal el Colegio?',
+    'SEXO_FEM': 'Sexo',
+    'TIENE_LAVADORA': '¿Tiene Lavadora?',
+    'ESTRATOVIVIENDA': 'Estrato de Vivienda',
+    'CUARTOSHOGAR': 'Cantidad de Cuartos',
+    'ESTU_NACIONALIDAD': 'Nacionalidad',
+    'COLE_CARACTER': 'Carácter del Colegio',
+    'COLE_DEPTO_UBICACION': 'Departamento del Colegio',
+    'COLE_GENERO': 'Tipo del Colegio por genero',
+    'TIENE_AUTOMOVIL': 'Tiene Automóvil',
+    'ESTU_ESTADOINVESTIGACION': 'Estado de Investigación'
+}
+
 opciones_categoricas = {
     'COLE_CARACTER': option_cole_caracter,
     'COLE_DEPTO_UBICACION': option_cole_depto_ubicacion,
@@ -62,9 +80,9 @@ defaults = {
 }
 tipo_variable = {
     'COLE_AREA_URBANO': 'binaria', 'BILINGUE': 'binaria', 'CALEN_A': 'binaria', 'SEDE_PRINCIPAL': 'binaria',
-    'SEXO': 'binaria', 'TIENE_LAVADORA': 'binaria', 'ESTRATOVIVIENDA': 'numerica', 'CUARTOSHOGAR': 'numerica', 'ESTU_NACIONALIDAD': 'categorica',
+    'SEXO_FEM': 'binaria', 'TIENE_LAVADORA': 'binaria', 'ESTRATOVIVIENDA': 'numerica', 'CUARTOSHOGAR': 'numerica', 'ESTU_NACIONALIDAD': 'categorica',
     'COLE_CARACTER': 'categorica', 'COLE_DEPTO_UBICACION': 'categorica', 'COLE_GENERO': 'categorica',
-    'TIENE_AUTOMOVIL': 'binaria','ESTU_ESTADOINVESTIGACION': 'categorica'
+    'TIENE_AUTOMOVIL': 'binaria'
 }
 print('3')
 # APP
@@ -79,13 +97,28 @@ app.layout = html.Div([
             'marginBottom': '5px',
             'fontFamily': 'Segoe UI, sans-serif'
         }),
-        html.P("Observación del estimado del nivel de inglés respecto a características demográficas y geográficas del estudiante.", style={
-            'textAlign': 'center',
-            'color': 'white',
-            'fontSize': '16px',
-            'marginTop': '0px',
-            'fontFamily': 'Segoe UI, sans-serif'
-        })
+        html.P(
+            "Este tablero interactivo utiliza datos reales de resultados del examen ICFES para estimar el nivel de inglés de los estudiantes, "
+            "basándose en características demográficas, académicas y del hogar.",
+            style={
+                'textAlign': 'center',
+                'color': 'white',
+                'fontSize': '16px',
+                'marginTop': '10px',
+                'marginBottom': '5px',
+                'fontFamily': 'Segoe UI, sans-serif'
+            }
+        ),
+        html.P(
+            "El objetivo de este análisis es identificar patrones relevantes para apoyar estrategias de acción para las actividades del INA.",
+            style={
+                'textAlign': 'center',
+                'color': 'white',
+                'fontSize': '16px',
+                'marginTop': '0px',
+                'fontFamily': 'Segoe UI, sans-serif'
+            }
+        )
     ], style={
         'backgroundColor': '#004b6b',
         'padding': '20px',
@@ -267,7 +300,7 @@ app.layout = html.Div([
     html.Div([
         dcc.Dropdown(
             id='selector-adicionales',
-            options=[{'label': v.replace('_', ' ').title(), 'value': v} for v in tipo_variable.keys()],
+            options=[{'label': nombres_amigables[v], 'value': v} for v in tipo_variable.keys()],
             placeholder='Selecciona variable adicional a agregar'
         ),
         html.Div(id='contenedor-campos'),
@@ -293,6 +326,8 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.Label("Selecciona el nivel de inglés:",style={'fontFamily': 'Segoe UI, sans-serif'}),
+            html.P("Visualiza la distribución de estudiantes por departamento para un nivel específico de inglés.",
+               style={'fontFamily': 'Segoe UI, sans-serif', 'fontSize': '14px'}),
             dcc.Dropdown(id='nivel-dropdown', options=[{'label': n, 'value': n} for n in niveles], value='B1'),
             dcc.Graph(id='mapa-departamento')
         ], style={'width': '100%', 'marginTop': '30px','fontFamily': 'Segoe UI, sans-serif'}),
@@ -300,12 +335,16 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Label("Selecciona la ciudad:",style={'fontFamily': 'Segoe UI, sans-serif'}),
+                html.P("Compara los niveles de inglés alcanzados por los estudiantes en la ciudad seleccionada.",
+                   style={'fontFamily': 'Segoe UI, sans-serif', 'fontSize': '14px'}),
                 dcc.Dropdown(id='ciudad-dropdown', options=[{'label': c, 'value': c} for c in ciudades], value='MEDELLÍN',style={'fontFamily': 'Segoe UI, sans-serif'}),
                 dcc.Graph(id='grafico-niveles')
             ], style={'width': '48%', 'marginRight': '2%'}),
 
             html.Div([
                 html.Label("Selecciona ciudad y nivel para el Top 5 colegios:",style={'fontFamily': 'Segoe UI, sans-serif'}),
+                html.P("Consulta los cinco colegios con mayor número de estudiantes en el nivel seleccionado dentro de la ciudad.",
+                    style={'fontFamily': 'Segoe UI, sans-serif', 'fontSize': '14px'}),
                 dcc.Dropdown(id='ciudad-colegio-dropdown', options=[{'label': c, 'value': c} for c in ciudades], value='MEDELLÍN',style={'fontFamily': 'Segoe UI, sans-serif'}),
                 dcc.Dropdown(id='nivel-colegio-dropdown', options=[{'label': n, 'value': n} for n in niveles], value='B1',style={'fontFamily': 'Segoe UI, sans-serif'}),
                 dcc.Graph(id='grafico-colegios')
@@ -431,14 +470,20 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     # Crear nuevo campo si no existe
     campos_ids = [c['props']['id'] if isinstance(c, dict) else getattr(c, 'id', None) for c in campos_actuales]
     if variable and f'adicional-{variable}' not in campos_ids:
-        # === SECCIÓN MODIFICADA PARA DISTINTOS TIPOS ===
+        
         if tipo_variable[variable] == 'binaria':
+            if variable == 'SEXO_FEM':
+                opciones = [{'label': 'Femenino', 'value': 1}, {'label': 'Masculino', 'value': 0}]
+            else:
+                opciones = [{'label': 'Sí', 'value': 1}, {'label': 'No', 'value': 0}]
+
             nuevo_input = dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': variable},
-                options=[{'label': 'Sí', 'value': 1}, {'label': 'No', 'value': 0}],
-                placeholder=variable.replace('_', ' ').title(),
+                options=opciones,
+                placeholder=nombres_amigables.get(variable, variable.replace('_', ' ').title()),
                 style={'width': '100%'}
             )
+
         elif tipo_variable[variable] == 'numerica':
             nuevo_input = dcc.Input(
                 id={'type': 'dynamic-input', 'index': variable},
@@ -462,7 +507,7 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
             )
 
         grupo = html.Div([
-            html.Label(variable.replace('_', ' ').title(), style={'display': 'block'}),
+            html.Label(nombres_amigables.get(variable, variable.replace('_', ' ').title()), style={'display': 'block'}),
             nuevo_input
         ], id=f'adicional-{variable}', style={
             'marginBottom': '10px',
@@ -483,7 +528,7 @@ def agregar_y_actualizar(variable, campos_actuales, resumen_actual, valores, ids
     encontrados = set()
     for val, id_dict in zip(valores, ids):
         variable_key = id_dict['index']
-        nombre = variable_key.replace('_', ' ').title()
+        nombre = nombres_amigables.get(variable_key, variable_key.replace('_', ' ').title())
         texto = f"{nombre}: {val if val is not None else 'Valor no especificado'}"
         encontrados.add(variable_key)
         resumen_actualizado.append(html.P(texto, id=f"resumen-{variable_key}"))
