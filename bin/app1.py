@@ -1,13 +1,10 @@
 import dash
-from dash import dcc, html, Input, Output, State, ctx
+from dash import dcc, html, Input, Output, State
 import pandas as pd
 import plotly.express as px
 import requests
 import json
-import os
 from model_load import new_estimation
-from dash import callback_context
-import mlflow
 
 
 # Carga de datos

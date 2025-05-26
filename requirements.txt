@@ -5,3 +5,12 @@ keras
 tensorflow
 unidecode
 dash
+json
+plotly
+matplotlib
+seaborn
+xgboost
+shap
+joblib
+numpy
+requests

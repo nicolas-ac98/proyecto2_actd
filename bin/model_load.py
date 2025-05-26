@@ -1,11 +1,8 @@
-import mlflow
 import joblib
-import pandas as pd
-import json
 import numpy as np
 from tensorflow import keras
 
-def new_estimation(new_data, version_model = 'pmv_v', preprocessor='preprocessors/english_performance_preprocessor_v1.pkl'):
+def new_estimation(new_data, preprocessor='preprocessors/english_performance_preprocessor_v1.pkl'):
     # Cargar el preprocesador
     preprocessor = joblib.load(preprocessor)
 
