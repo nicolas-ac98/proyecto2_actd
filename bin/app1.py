@@ -11,9 +11,9 @@ import mlflow
 
 
 # Carga de datos
-df = pd.read_csv("Base_de_Datos_Icfes.csv")
+df = pd.read_csv("C:/Users/JESUS/OneDrive - Universidad de los andes/Maestría Ing Industrial/Analítica Computacional/Proyecto_2/Base de Datos - Icfes/Base2.csv")
 niveles_orden = ['A-', 'A1', 'A2', 'B1', 'B+']
-
+print('1')
 # Ajuste de nombres con el mapa
 map_nombres = {
     'VALLE': 'VALLE DEL CAUCA',
@@ -37,7 +37,7 @@ with open("../data/option_estu_estadoinvestigacion", encoding="utf-8") as f:
 
 with open("../data/option_estu_nacionalidad", encoding="utf-8") as f:
     option_estu_nacionalidad = json.load(f)
-
+print('2')
 opciones_categoricas = {
     'COLE_CARACTER': option_cole_caracter,
     'COLE_DEPTO_UBICACION': option_cole_depto_ubicacion,
@@ -66,7 +66,7 @@ tipo_variable = {
     'COLE_CARACTER': 'categorica', 'COLE_DEPTO_UBICACION': 'categorica', 'COLE_GENERO': 'categorica',
     'TIENE_AUTOMOVIL': 'binaria','ESTU_ESTADOINVESTIGACION': 'categorica'
 }
-
+print('3')
 # APP
 app = dash.Dash(__name__)
 app.title = "Tablero ICFES - Nivel de Inglés"
@@ -315,7 +315,7 @@ app.layout = html.Div([
 ])
 
 #CALLBACKS
-
+print('4')
 #Mapa por departamento
 @app.callback(
     Output('mapa-departamento', 'figure'),
@@ -518,13 +518,13 @@ def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_pad
 
     #Diccionario con los valores obligatorios
     datos = {
-        'P1_INTERNET': internet,
-        'P2_COLE_OFICIAL': oficial,
-        'P3_PC': pc,
-        'P4_JORNADA': jornada,
-        'P5_EDU_MADRE': edu_madre,
-        'P6_EDU_PADRE': edu_padre,
-        'P7_PERSONAS_HOGAR': personas
+        'TIENE_INTERNET': internet,
+        'COLE_OFICIAL': oficial,
+        'TIENE_COMPUTADOR': pc,
+        'COLE_JORNADA': jornada,
+        'FAMI_EDUCACIONMADRE': edu_madre,
+        'FAMI_EDUCACIONPADRE': edu_padre,
+        'PERSONASHOGAR': personas
     }
 
     # Añadir los adicionales si existen

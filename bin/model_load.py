@@ -3,12 +3,15 @@ import joblib
 import pandas as pd
 import json
 import numpy as np
+from tensorflow import keras
 
-def new_estimation(new_data, version_model = 'pmv_v3', preprocessor='preprocessors/english_performance_preprocessor_v1.pkl'):
+
+def new_estimation(new_data, version_model = 'modelo_v7.keras', preprocessor='preprocessors/english_performance_preprocessor_v1.pkl'):
     # Cargar el preprocesador
     preprocessor = joblib.load(preprocessor)
 
     # Obtener el experimento por nombre
+    '''
     experiment = mlflow.get_experiment_by_name("English performance model")
 
     # Obtener todos los runs de ese experimento
@@ -19,7 +22,8 @@ def new_estimation(new_data, version_model = 'pmv_v3', preprocessor='preprocesso
     run_id = run.run_id
 
     # Cargar el modelo del run
-    model = mlflow.keras.load_model(f"runs:/{run_id}/english_performance_model_v1")
+    model = mlflow.keras.load_model(f"runs:/{run_id}/english_performance_model_v1")'''
+    model = keras.models.load_model(version_model)
 
     # Aplicar el preprocesador
     new_data_processed = preprocessor.transform(new_data)
@@ -33,7 +37,7 @@ def new_estimation(new_data, version_model = 'pmv_v3', preprocessor='preprocesso
     cat = ['A-','A1','A2','B1','B+']
     return cat[y_pred_class[0]], max(y_pred_probs[0])
 
-
+'''
 if __name__ == '__main__':
     # Suponiendo que tienes un nuevo DataFrame con las mismas columnas que X
     # Leer el archivo
@@ -44,3 +48,5 @@ if __name__ == '__main__':
     new_data = pd.DataFrame([data])
 
     print(new_estimation(new_data))
+
+    '''
