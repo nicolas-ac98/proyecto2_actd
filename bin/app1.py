@@ -530,10 +530,9 @@ def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_pad
 
         print("2 - Obligatorios:", datos)
 
-        # Convertir adicionales a diccionario temporal
+        #Convertir adicionales a diccionario temporal
         adicionales_dict = {id_['index']: val for val, id_ in zip(adicionales_valores, adicionales_ids)}
 
-        # Asegurar que todas las variables adicionales estén presentes
         for clave in defaults:
             datos[clave] = adicionales_dict.get(clave, defaults[clave])
 
@@ -543,7 +542,7 @@ def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_pad
         df = pd.DataFrame([datos])
         print("4 - DataFrame construido:", df)
 
-        # Llamar la función de predicción
+        #Llamar la función de predicción
         nivel, prob = new_estimation(df)
 
         print("5 - Predicción realizada")
@@ -551,7 +550,7 @@ def predecir_ingles(n_clicks, internet, oficial, pc, jornada, edu_madre, edu_pad
         return f"Nivel de inglés predicho: {nivel}\nConfianza: {prob:.2%}"
 
     except Exception as e:
-        print("❌ Error en callback:", e)
+        print("Error en callback:", e)
         return f"Error en predicción: {e}"
 
 
